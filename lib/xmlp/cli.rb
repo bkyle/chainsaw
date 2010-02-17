@@ -47,15 +47,21 @@ module XMLP
         end
 
         opts.on('--insert XML', 'Inserts XML before the node(s) returned by -expr') do |xml|
-          options[:insert] = xml
+          xml = File.new(xml) if xml[0] == "@"
+          fragment = REXML::Document.new(xml)
+          options[:insert] = fragment
         end
 
         opts.on('--append XML', 'Appends XML as a child of the node(s) returned by -expr') do |xml|
-          options[:append] = xml
+          xml = File.new(xml) if xml[0] == "@"
+          fragment = REXML::Document.new(xml)
+          options[:append] = fragment
         end
 
         opts.on('--replace XML', 'Replaces the node(s) returned by -expr with XML') do |xml|
-          options[:replace] = xml
+          xml = File.new(xml) if xml[0] == "@"
+          fragment = REXML::Document.new(xml)
+          options[:replace] = fragment
         end
 
       end.parse!
@@ -80,7 +86,7 @@ module XMLP
             # if (options[:print] == :text)
             #   formatter.write_text(node, STDOUT)
             # else
-              formatter.write(node, STDOUT)
+              formatter.write node, STDOUT
             # end
           end
 
@@ -89,31 +95,25 @@ module XMLP
           end
 
           if (options[:insert])
-            filename = options[:insert]
-            fragment_file = File.new(filename)
-            fragment = REXML::Document.new(fragment_file)
-            node.parent.insert_before(node, fragment)
+            fragment = options[:insert].deep_clone
+            node.parent.insert_before node, fragment
           end
 
           if (options[:append])
-            filename = options[:append]
-            fragment_file = File.new(filename)
-            fragment = REXML::Document.new(fragment_file)
+            fragment = options[:append].deep_clone
             node << fragment
           end
 
           if (options[:replace])
-            filename = options[:replace]
-            fragment_file = File.new(filename)
-            fragment = REXML::Document.new(fragment_file)
-            node.parent.replace_child(node, fragment)
+            fragment = options[:replace].deep_clone
+            node.parent.replace_child node, fragment
           end
 
         end
       end
 
       if (not options[:print])
-        formatter.write(document, STDOUT)
+        formatter.write document, STDOUT
       end
 
     end
