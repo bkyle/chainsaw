@@ -1,7 +1,7 @@
 require 'optparse'
 require 'rexml/document'
 
-module XMLP
+module XT
 
   class CLI
 
@@ -12,7 +12,7 @@ module XMLP
       options[:filename] = ARGV.shift
 
       OptionParser.new do |opts|
-        opts.banner = "Usage: xmlp file [options]"
+        opts.banner = "Usage: xt file [options]"
         
         opts.on('--expr EXPRESSION', 'Finds nodes that match EXPRESSION.') do |expr|
           options[:expr] = expr
