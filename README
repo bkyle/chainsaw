@@ -1,0 +1,30 @@
+xml-tool
+========
+
+By Bryan Kyle <bryan.kyle@gmail.com>
+
+xml-tool is a simple tool to slice, dice, and modify XML files.  It takes an XML file, an XPath expression and a series of operations to perform on the file.  The operations consist of printing, pruning (removing), inserting, appending and replacing the node(s) that match the specified expression with other markup. Markup being added to the document can either come from a file, or be specified directly on the command line.
+
+At its most basic, xml-tool allows you to simply output the nodesets that match an XPath expression.  Optionally, xml-tool allows you to "pretty-print" the output.  To pretty-print the the nodes in the document that match an expression you can simply use the following:
+
+    xt input.xml --expr "/some/expression" --print --pretty
+
+If you need to modify the DOM, there are facilities to insert nodes into the DOM as well as remove existing ones.  The --prune command will remove nodes that match the specified expression.  As for inserting nodes there are 3 commands to choose from: --insert, --append, --replace.  All of these take a paramter which is either the name of a file, prefixed with @, or an XML literal string.  The --insert command inserts the XML _before_ the node(s) matched by the expression. --append appends the XML as children of the matched node(s).  And finally --replace replaces the matched node(s).  Below are some examples.
+
+To remove all of the nodes that match an expression:
+
+    xt input.xml --expr "/some/expression" --prune
+
+To insert a piece of XML into the document before all of the nodes that match an expression:
+
+    xt input.xml --expr "/some/expression" --insert "<foo>bar</foo>"
+
+To append the contents of a file as children of the nodes matching an expression:
+
+    xt input.xml --expr "/some/expression" --append @fragment.xml
+
+To replace all of the nodes matching an expression with some markup:
+
+    xt input.xml --expr "/some/expression" --replace "<foo>bar</foo>"
+
+xml-tool also allows you to select a subset of an expression by using the --first, --last, and --all options.  These switches modify the operation of the commands to only affect the first, last or all matched nodes respectively.
