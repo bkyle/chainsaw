@@ -12,7 +12,7 @@ module XMLP
       options[:filename] = ARGV.shift
 
       OptionParser.new do |opts|
-        opts.banner = "Usage: xmlp [options]"
+        opts.banner = "Usage: xmlp file [options]"
         
         opts.on('--expr EXPRESSION', 'Finds nodes that match EXPRESSION.') do |expr|
           options[:expr] = expr
