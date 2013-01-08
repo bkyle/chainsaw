@@ -9,9 +9,7 @@ module XT
 
       options = { :expr => ".", :operate_on => :all }
 
-      options[:filename] = ARGV.shift
-
-      OptionParser.new do |opts|
+      parser = OptionParser.new do |opts|
         opts.banner = "Usage: xt file [options]"
         
         opts.on('--expr EXPRESSION', 'Finds nodes that match EXPRESSION.') do |expr|
@@ -24,6 +22,10 @@ module XT
 
         opts.on('--print', 'Print the matched nodes') do
           options[:print] = :node
+        end
+        
+        opts.on('--delimeter STRING', 'Delimeter to print between each result node') do |delimeter|
+            options[:delimeter] = delimeter
         end
 
         # opts.on('--text', 'Returns the text of the node(s) returned by -expr.  This can be combined with -first, -last, and -all') do
@@ -63,16 +65,29 @@ module XT
           fragment = REXML::Document.new(xml)
           options[:replace] = fragment
         end
+        
+        opts.on('--help', 'Displays this message') do
+            puts opts.help
+            exit(1)
+        end
 
       end.parse!
 
+      options[:filename] = ARGV.shift
+      
       if (options[:pretty_print])
         formatter = REXML::Formatters::Pretty.new
       else
         formatter = REXML::Formatters::Default.new
       end
 
-      file = File.new(options[:filename])
+      
+      if not options[:filename].nil?
+        file = File.new(options[:filename])
+      else
+        file = STDIN
+      end      
+
       document = REXML::Document.new(file)
       matches = REXML::XPath.match(document, options[:expr])
 
@@ -87,6 +102,7 @@ module XT
             #   formatter.write_text(node, STDOUT)
             # else
               formatter.write node, STDOUT
+              puts options[:delimeter]
             # end
           end
 
