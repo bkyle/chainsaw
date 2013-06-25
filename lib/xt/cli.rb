@@ -7,7 +7,12 @@ module XT
 
     def CLI.execute
 
-      options = { :expr => ".", :operate_on => :all }
+      options = { :expr => ".", 
+                    :operate_on => :all, 
+                    :abnormal_exit => 1,
+                    :normal_exit => 0,
+                    :quiet => false,
+                    :print => :node }
 
       parser = OptionParser.new do |opts|
         opts.banner = "Usage: xt file [options]"
@@ -22,6 +27,17 @@ module XT
 
         opts.on('--print', 'Print the matched nodes') do
           options[:print] = :node
+          options[:quiet] = false
+        end
+
+        opts.on('--matched', 'Exit with the number of matched elements.  If this option is turned on, an abnormal exit will be -1.') do
+            options[:matched] = true
+            options[:abnormal_exit] = -1
+        end
+        
+        opts.on('--quiet', 'Turns off all output.  Useful for testing to see if an expression matches any nodes') do
+            options[:quiet] = true
+            options[:print] = nil
         end
         
         opts.on('--delimeter STRING', 'Delimeter to print between each result node') do |delimeter|
@@ -68,7 +84,7 @@ module XT
         
         opts.on('--help', 'Displays this message') do
             puts opts.help
-            exit(1)
+            exit options[:abnormal_exit]
         end
 
       end.parse!
@@ -83,7 +99,12 @@ module XT
 
       
       if not options[:filename].nil?
-        file = File.new(options[:filename])
+        begin
+          file = File.new(options[:filename])
+        rescue
+          puts "Couldn't open " + options[:filename]
+          exit options[:abnormal_exit]
+        end
       else
         file = STDIN
       end      
@@ -128,10 +149,22 @@ module XT
         end
       end
 
-      if (not options[:print])
+      if (not options[:print] and not options[:quiet]) then
         formatter.write document, STDOUT
       end
 
+      if options[:matched] then
+        exit matches.count
+      elsif options[:quiet] then
+        if matches.count == 0 then
+          exit options[:abnormal_exit]
+        else
+          exit options[:normal_exit]
+        end
+      else
+        exit options[:normal_exit]
+      end
+      
     end
     
   end
