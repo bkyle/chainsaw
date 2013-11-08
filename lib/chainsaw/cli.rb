@@ -1,11 +1,13 @@
 require 'optparse'
 require 'rexml/document'
+require 'chainsaw/parse'
 
-module XT
+module Chainsaw
 
   class CLI
 
     def CLI.execute
+
 
       options = { :expr => ".", 
                     :operate_on => :all, 
@@ -15,7 +17,7 @@ module XT
                     :print => :node }
 
       parser = OptionParser.new do |opts|
-        opts.banner = "Usage: xt file [options]"
+        opts.banner = "Usage: chainsaw file [options]"
         
         opts.on('--expr EXPRESSION', 'Finds nodes that match EXPRESSION.') do |expr|
           options[:expr] = expr
